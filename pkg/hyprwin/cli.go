@@ -59,10 +59,10 @@ func (dir direction) ToMonitor() bool {
 
 func (dir direction) IsValid(dp dispatcher) bool {
 	isBaseDir := slices.Contains(directions, dir)
-	switch dp.Str() {
-	case "movefocus":
+	switch dp {
+	case dispatcher("movefocus"):
 		return isBaseDir
-	case "movewindow":
+	case dispatcher("movewindow"):
 		return isBaseDir || dir.ToMonitor()
 	}
 	return false
