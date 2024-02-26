@@ -36,7 +36,7 @@ Dispatchers:
                     in that direction
 Directions:
     l,r,u,d         For left, right, up, down
-    mon:<monitor>   Only for movefocus dispatcher`
+    mon:<monitor>   Only for movefocus dispatcher
 ```
 
 Bind it in your `hyprland.conf` like:
