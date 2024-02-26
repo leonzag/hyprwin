@@ -90,7 +90,7 @@ func HandleCli() (cmd *command, err error) {
 	}
 
 	if helpRequested(args) {
-		fmt.Print(Usage)
+		fmt.Println(Usage)
 		os.Exit(0)
 	}
 
