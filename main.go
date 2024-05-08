@@ -21,7 +21,7 @@ func main() {
 		os.Exit(1)
 	}
 	if out != "" {
-		printOut(string(out))
+		printOut(out)
 	}
 }
 
