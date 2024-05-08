@@ -24,6 +24,7 @@ Directions:
     mon:<monitor>   Only for movefocus dispatcher`
 
 var (
+	ErrHelpRequested       = errors.New("help requested")
 	ErrNotEnoughArgs       = errors.New("not enough arguments, expected 2")
 	ErrTooManyArgs         = errors.New("too many arguments, expected 2")
 	ErrIncorrectDispatcher = errors.New("incorrect dispatcher received")
@@ -93,8 +94,7 @@ func HandleCli() (cmd *command, err error) {
 	args := os.Args[1:]
 
 	if helpRequested(args) {
-		fmt.Println(Usage)
-		os.Exit(0)
+		return nil, ErrHelpRequested
 	}
 
 	if len(args) < 2 {
