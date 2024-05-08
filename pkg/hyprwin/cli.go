@@ -84,7 +84,7 @@ func helpRequested(args []string) bool {
 
 func HandleCli() (cmd *command, err error) {
 	args := os.Args[1:]
-	if len(args) == 0 {
+	if len(args) < 2 {
 		fmt.Print(Usage)
 		return nil, errors.New("not enough arguments")
 	}
