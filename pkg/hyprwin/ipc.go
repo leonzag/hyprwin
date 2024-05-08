@@ -8,7 +8,9 @@ import (
 	"strings"
 )
 
-type winObj struct {
+var BufSize = 8192
+
+type WinObj struct {
 	Grouped        []string `json:"grouped"`
 	Class          string   `json:"class"`
 	Swallowing     string   `json:"swallowing"`
@@ -39,7 +41,7 @@ type wsObj struct {
 
 type IPC interface {
 	Hyprctl(commands ...string) ([]byte, error)
-	ActiveWindow() (*winObj, error)
+	ActiveWindow() (*WinObj, error)
 }
 
 type ipc struct {
@@ -56,17 +58,15 @@ func InitIPC() IPC {
 	}
 }
 
-func (c *ipc) ActiveWindow() (*winObj, error) {
+func (c *ipc) ActiveWindow() (*WinObj, error) {
 	jsonStr, err := c.Hyprctl("activewindow")
 	if err != nil {
 		return nil, err
 	}
-	win := &winObj{}
+	win := &WinObj{}
 	err = json.Unmarshal([]byte(jsonStr), win)
 	return win, err
 }
-
-var BufSize = 8192
 
 // Hyprctl executes commands and returns response. If only one is passed, then sets json flag (-j)
 func (c *ipc) Hyprctl(commands ...string) (resp []byte, err error) {

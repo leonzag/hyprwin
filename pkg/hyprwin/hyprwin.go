@@ -6,12 +6,12 @@ import (
 )
 
 type manager struct {
-	command *command
-	ipc     IPC
+	cmd *CommandRequest
+	ipc IPC
 }
 
-func Dispatch(command *command) (out string, err error) {
-	mgr := manager{command, InitIPC()}
+func Dispatch(cmd *CommandRequest) (out string, err error) {
+	mgr := manager{cmd, InitIPC()}
 
 	win, err := mgr.ipc.ActiveWindow()
 	if err != nil {
@@ -19,10 +19,10 @@ func Dispatch(command *command) (out string, err error) {
 	}
 
 	var resp []byte
-	switch command.dispatcher {
-	case dispatcher("movewindow"):
+	switch cmd.dispatcher {
+	case DispatcherCmd("movewindow"):
 		resp, err = mgr.moveWindow(win)
-	case dispatcher("movefocus"):
+	case DispatcherCmd("movefocus"):
 		resp, err = mgr.moveFocus(win)
 	default:
 		err = errors.New("unknown dispatcher")
@@ -30,10 +30,10 @@ func Dispatch(command *command) (out string, err error) {
 	return string(resp), err
 }
 
-func (m manager) moveWindow(win *winObj) (resp []byte, err error) {
-	dir := m.command.direction.Str()
+func (m manager) moveWindow(win *WinObj) (resp []byte, err error) {
+	dir := m.cmd.direction.Str()
 
-	if m.command.direction.ToMonitor() {
+	if m.cmd.direction.ToMonitor() {
 		return m.ipc.Hyprctl("dispatch moveoutofgroup", "dispatch movewindow "+dir)
 	}
 
@@ -54,8 +54,8 @@ func (m manager) moveWindow(win *winObj) (resp []byte, err error) {
 	return m.ipc.Hyprctl("dispatch movegroupwindow " + dir)
 }
 
-func (m manager) moveFocus(win *winObj) (resp []byte, err error) {
-	dir := m.command.direction.Str()
+func (m manager) moveFocus(win *WinObj) (resp []byte, err error) {
+	dir := m.cmd.direction.Str()
 
 	pos := slices.Index(win.Grouped, win.Address)
 	grpSize := len(win.Grouped)

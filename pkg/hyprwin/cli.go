@@ -32,53 +32,53 @@ var (
 )
 
 type (
-	dispatcher string
-	direction  string
+	DispatcherCmd string
+	DirectionArg  string
 )
 
 var (
-	dispatchers = []dispatcher{
-		dispatcher("movefocus"),
-		dispatcher("movewindow"),
+	dispatchers = []DispatcherCmd{
+		DispatcherCmd("movefocus"),
+		DispatcherCmd("movewindow"),
 	}
-	directions = []direction{
-		direction("l"),
-		direction("r"),
-		direction("u"),
-		direction("d"),
+	directions = []DirectionArg{
+		DirectionArg("l"),
+		DirectionArg("r"),
+		DirectionArg("u"),
+		DirectionArg("d"),
 	}
 )
 
-func (dp dispatcher) Str() string {
+func (dp DispatcherCmd) Str() string {
 	return string(dp)
 }
 
-func (dp dispatcher) IsValid() bool {
+func (dp DispatcherCmd) IsValid() bool {
 	return slices.Contains(dispatchers, dp)
 }
 
-func (dir direction) Str() string {
+func (dir DirectionArg) Str() string {
 	return string(dir)
 }
 
-func (dir direction) ToMonitor() bool {
+func (dir DirectionArg) ToMonitor() bool {
 	return strings.HasPrefix(dir.Str(), "mon:")
 }
 
-func (dir direction) IsValid(dp dispatcher) bool {
+func (dir DirectionArg) IsValid(dp DispatcherCmd) bool {
 	isBaseDir := slices.Contains(directions, dir)
 	switch dp {
-	case dispatcher("movefocus"):
+	case DispatcherCmd("movefocus"):
 		return isBaseDir
-	case dispatcher("movewindow"):
+	case DispatcherCmd("movewindow"):
 		return isBaseDir || dir.ToMonitor()
 	}
 	return false
 }
 
-type command struct {
-	dispatcher dispatcher
-	direction  direction
+type CommandRequest struct {
+	dispatcher DispatcherCmd
+	direction  DirectionArg
 }
 
 func helpRequested(args []string) bool {
@@ -90,7 +90,7 @@ func helpRequested(args []string) bool {
 	return false
 }
 
-func HandleCli() (cmd *command, err error) {
+func HandleCli() (cmd *CommandRequest, err error) {
 	args := os.Args[1:]
 
 	if helpRequested(args) {
@@ -106,7 +106,7 @@ func HandleCli() (cmd *command, err error) {
 		return nil, ErrTooManyArgs
 	}
 
-	dp, dir := dispatcher(args[0]), direction(args[1])
+	dp, dir := DispatcherCmd(args[0]), DirectionArg(args[1])
 	if !dp.IsValid() {
 		return nil, ErrIncorrectDispatcher
 	}
@@ -114,5 +114,5 @@ func HandleCli() (cmd *command, err error) {
 		return nil, ErrIncorrectDirection
 	}
 
-	return &command{dp, dir}, nil
+	return &CommandRequest{dp, dir}, nil
 }
