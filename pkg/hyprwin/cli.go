@@ -23,6 +23,13 @@ Directions:
     l,r,u,d         For left, right, up, down
     mon:<monitor>   Only for movefocus dispatcher`
 
+var (
+	ErrNotEnoughArgs       = errors.New("not enough arguments, expected 2")
+	ErrTooManyArgs         = errors.New("too many arguments, expected 2")
+	ErrIncorrectDispatcher = errors.New("incorrect dispatcher received")
+	ErrIncorrectDirection  = errors.New("incorrect direction received")
+)
+
 type (
 	dispatcher string
 	direction  string
@@ -84,26 +91,27 @@ func helpRequested(args []string) bool {
 
 func HandleCli() (cmd *command, err error) {
 	args := os.Args[1:]
-	if len(args) < 2 {
-		fmt.Print(Usage)
-		return nil, errors.New("not enough arguments")
-	}
 
 	if helpRequested(args) {
 		fmt.Println(Usage)
 		os.Exit(0)
 	}
 
+	if len(args) < 2 {
+		fmt.Print(Usage)
+		return nil, ErrNotEnoughArgs
+	}
+
 	if len(args) != 2 {
-		return nil, errors.New("incorrect number of arguments: expected 2")
+		return nil, ErrTooManyArgs
 	}
 
 	dp, dir := dispatcher(args[0]), direction(args[1])
 	if !dp.IsValid() {
-		return nil, errors.New("incorrect dispatcher received")
+		return nil, ErrIncorrectDispatcher
 	}
 	if !dir.IsValid(dp) {
-		return nil, errors.New("incorrect direction received")
+		return nil, ErrIncorrectDirection
 	}
 
 	return &command{dp, dir}, nil
