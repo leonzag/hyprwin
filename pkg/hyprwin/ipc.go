@@ -5,10 +5,15 @@ import (
 	"errors"
 	"net"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
-var BufSize = 8192
+var (
+	BufSize              = 8192
+	ErrIpcHyprSignNotSet = errors.New("failed connect to ipc: $HYPRLAND_INSTANCE_SIGNATURE env var not set")
+	ErrIpcSocketNotFound = errors.New("failed connect to ipc: socket not found")
+)
 
 type WinObj struct {
 	Grouped        []string `json:"grouped"`
@@ -48,14 +53,34 @@ type ipc struct {
 	addr *net.UnixAddr
 }
 
-func InitIPC() IPC {
+func InitIPC() (IPC, error) {
 	sign := os.Getenv("HYPRLAND_INSTANCE_SIGNATURE")
+	if sign == "" {
+		return nil, ErrIpcHyprSignNotSet
+	}
+
+	socketPath := ""
+
+	runtimeDir := os.Getenv("XDG_RUNTIME_DIR")
+	tmpDir := filepath.Join(os.TempDir(), "hypr")
+	dirs := []string{tmpDir, runtimeDir}
+
+	for _, socketHome := range dirs {
+		fpath := filepath.Join(socketHome, sign, ".socket.sock")
+		if finfo, err := os.Stat(fpath); err == nil && !finfo.IsDir() {
+			socketPath = fpath
+		}
+	}
+	if socketPath == "" {
+		return nil, ErrIpcSocketNotFound
+	}
+
 	return &ipc{
 		&net.UnixAddr{
 			Name: "/tmp/hypr/" + sign + "/.socket.sock",
 			Net:  "unix",
 		},
-	}
+	}, nil
 }
 
 func (c *ipc) ActiveWindow() (*WinObj, error) {

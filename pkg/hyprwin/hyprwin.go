@@ -11,7 +11,11 @@ type manager struct {
 }
 
 func Dispatch(cmd *CommandRequest) (out string, err error) {
-	mgr := manager{cmd, InitIPC()}
+	ipc, err := InitIPC()
+	if err != nil {
+		return "", err
+	}
+	mgr := manager{cmd, ipc}
 
 	win, err := mgr.ipc.ActiveWindow()
 	if err != nil {
