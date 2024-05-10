@@ -14,6 +14,9 @@ func main() {
 	if errors.Is(err, hyprwin.ErrHelpRequested) {
 		fmt.Println(hyprwin.Usage)
 		os.Exit(0)
+	} else if errors.Is(err, hyprwin.ErrVersionRequested) {
+		printOut(hyprwin.Version)
+		os.Exit(0)
 	} else if err != nil {
 		printErr(err)
 		os.Exit(1)
