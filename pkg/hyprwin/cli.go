@@ -23,54 +23,62 @@ Directions:
     l,r,u,d         For left, right, up, down
     mon:<monitor>   Only for movefocus dispatcher`
 
+var (
+	ErrHelpRequested       = errors.New("help requested")
+	ErrNotEnoughArgs       = errors.New("not enough arguments, expected 2")
+	ErrTooManyArgs         = errors.New("too many arguments, expected 2")
+	ErrIncorrectDispatcher = errors.New("incorrect dispatcher received")
+	ErrIncorrectDirection  = errors.New("incorrect direction received")
+)
+
 type (
-	dispatcher string
-	direction  string
+	DispatcherCmd string
+	DirectionArg  string
 )
 
 var (
-	dispatchers = []dispatcher{
-		dispatcher("movefocus"),
-		dispatcher("movewindow"),
+	dispatchers = []DispatcherCmd{
+		DispatcherCmd("movefocus"),
+		DispatcherCmd("movewindow"),
 	}
-	directions = []direction{
-		direction("l"),
-		direction("r"),
-		direction("u"),
-		direction("d"),
+	directions = []DirectionArg{
+		DirectionArg("l"),
+		DirectionArg("r"),
+		DirectionArg("u"),
+		DirectionArg("d"),
 	}
 )
 
-func (dp dispatcher) Str() string {
+func (dp DispatcherCmd) Str() string {
 	return string(dp)
 }
 
-func (dp dispatcher) IsValid() bool {
+func (dp DispatcherCmd) IsValid() bool {
 	return slices.Contains(dispatchers, dp)
 }
 
-func (dir direction) Str() string {
+func (dir DirectionArg) Str() string {
 	return string(dir)
 }
 
-func (dir direction) ToMonitor() bool {
+func (dir DirectionArg) ToMonitor() bool {
 	return strings.HasPrefix(dir.Str(), "mon:")
 }
 
-func (dir direction) IsValid(dp dispatcher) bool {
+func (dir DirectionArg) IsValid(dp DispatcherCmd) bool {
 	isBaseDir := slices.Contains(directions, dir)
 	switch dp {
-	case dispatcher("movefocus"):
+	case DispatcherCmd("movefocus"):
 		return isBaseDir
-	case dispatcher("movewindow"):
+	case DispatcherCmd("movewindow"):
 		return isBaseDir || dir.ToMonitor()
 	}
 	return false
 }
 
-type command struct {
-	dispatcher dispatcher
-	direction  direction
+type CommandRequest struct {
+	dispatcher DispatcherCmd
+	direction  DirectionArg
 }
 
 func helpRequested(args []string) bool {
@@ -82,29 +90,29 @@ func helpRequested(args []string) bool {
 	return false
 }
 
-func HandleCli() (cmd *command, err error) {
+func HandleCli() (cmd *CommandRequest, err error) {
 	args := os.Args[1:]
-	if len(args) == 0 {
-		fmt.Print(Usage)
-		return nil, errors.New("not enough arguments")
-	}
 
 	if helpRequested(args) {
-		fmt.Println(Usage)
-		os.Exit(0)
+		return nil, ErrHelpRequested
+	}
+
+	if len(args) < 2 {
+		fmt.Print(Usage)
+		return nil, ErrNotEnoughArgs
 	}
 
 	if len(args) != 2 {
-		return nil, errors.New("incorrect number of arguments: expected 2")
+		return nil, ErrTooManyArgs
 	}
 
-	dp, dir := dispatcher(args[0]), direction(args[1])
+	dp, dir := DispatcherCmd(args[0]), DirectionArg(args[1])
 	if !dp.IsValid() {
-		return nil, errors.New("incorrect dispatcher received")
+		return nil, ErrIncorrectDispatcher
 	}
 	if !dir.IsValid(dp) {
-		return nil, errors.New("incorrect direction received")
+		return nil, ErrIncorrectDirection
 	}
 
-	return &command{dp, dir}, nil
+	return &CommandRequest{dp, dir}, nil
 }

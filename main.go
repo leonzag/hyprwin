@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -10,7 +11,10 @@ import (
 
 func main() {
 	command, err := hyprwin.HandleCli()
-	if err != nil {
+	if errors.Is(err, hyprwin.ErrHelpRequested) {
+		fmt.Println(hyprwin.Usage)
+		os.Exit(0)
+	} else if err != nil {
 		printErr(err)
 		os.Exit(1)
 	}
@@ -21,7 +25,7 @@ func main() {
 		os.Exit(1)
 	}
 	if out != "" {
-		printOut(string(out))
+		printOut(out)
 	}
 }
 
