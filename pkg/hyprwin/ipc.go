@@ -62,11 +62,11 @@ func InitIPC() (IPC, error) {
 	socketPath := ""
 
 	runtimeDir := os.Getenv("XDG_RUNTIME_DIR")
-	tmpDir := filepath.Join(os.TempDir(), "hypr")
+	tmpDir := os.TempDir()
 	dirs := []string{tmpDir, runtimeDir}
 
 	for _, socketHome := range dirs {
-		fpath := filepath.Join(socketHome, sign, ".socket.sock")
+		fpath := filepath.Join(socketHome, "hypr", sign, ".socket.sock")
 		if finfo, err := os.Stat(fpath); err == nil && !finfo.IsDir() {
 			socketPath = fpath
 		}
@@ -77,7 +77,7 @@ func InitIPC() (IPC, error) {
 
 	return &ipc{
 		&net.UnixAddr{
-			Name: "/tmp/hypr/" + sign + "/.socket.sock",
+			Name: socketPath,
 			Net:  "unix",
 		},
 	}, nil
