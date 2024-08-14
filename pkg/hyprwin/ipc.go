@@ -16,27 +16,28 @@ var (
 )
 
 type WinObj struct {
-	Grouped        []string `json:"grouped"`
-	Class          string   `json:"class"`
-	Swallowing     string   `json:"swallowing"`
-	InitialTitle   string   `json:"initialTitle"`
-	InitialClass   string   `json:"inittialClass"`
-	Address        string   `json:"address"`
-	Title          string   `json:"title"`
-	Workspace      wsObj    `json:"workspace"`
-	Size           [2]int   `json:"size"`
-	At             [2]int   `json:"at"`
-	Monitor        int      `json:"monitor"`
-	FocusHistoryID int      `json:"fucusHistoryID"`
-	Pid            int      `json:"pid"`
-	FullscreenMode int      `json:"fullscreenMode"`
-	Pinned         bool     `json:"pinned"`
-	Fullscreen     bool     `json:"fullscreen"`
-	Xwayland       bool     `json:"xwayland"`
-	FakeFullscreen bool     `json:"fakeFullscreen"`
-	Hidden         bool     `json:"hidden"`
-	Mapped         bool     `json:"mapped"`
-	Floating       bool     `json:"floating"`
+	Address          string   `json:"address"`
+	Mapped           bool     `json:"mapped"`
+	Hidden           bool     `json:"hidden"`
+	At               [2]int   `json:"at"`
+	Size             [2]int   `json:"size"`
+	Workspace        wsObj    `json:"workspace"`
+	Floating         bool     `json:"floating"`
+	Pseudo           bool     `json:"pseudo"`
+	Monitor          int      `json:"monitor"`
+	Class            string   `json:"class"`
+	Title            string   `json:"title"`
+	InitialClass     string   `json:"inittialClass"`
+	InitialTitle     string   `json:"initialTitle"`
+	Pid              int      `json:"pid"`
+	Xwayland         bool     `json:"xwayland"`
+	Pinned           bool     `json:"pinned"`
+	Fullscreen       int      `json:"fullscreen"`
+	FullscreenClient int      `json:"fullscreenClient"`
+	Grouped          []string `json:"grouped"`
+	Tags             []string `json:"tags"`
+	Swallowing       string   `json:"swallowing"`
+	FocusHistoryID   int      `json:"fucusHistoryID"`
 }
 
 type wsObj struct {
