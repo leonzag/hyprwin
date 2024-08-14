@@ -13,6 +13,7 @@ const Usage string = `Usage:
 
 Flag:
     --help          Show this message
+    --version       Show program version
 
 Dispatchers:
     movefocus       Moves the focus in a direction
@@ -25,6 +26,7 @@ Directions:
 
 var (
 	ErrHelpRequested       = errors.New("help requested")
+	ErrVersionRequested    = errors.New("version requested")
 	ErrNotEnoughArgs       = errors.New("not enough arguments, expected 2")
 	ErrTooManyArgs         = errors.New("too many arguments, expected 2")
 	ErrIncorrectDispatcher = errors.New("incorrect dispatcher received")
@@ -90,11 +92,24 @@ func helpRequested(args []string) bool {
 	return false
 }
 
+func versionRequested(args []string) bool {
+	for _, v := range []string{"v", "-v", "--version", "version"} {
+		if slices.Contains(args, v) {
+			return true
+		}
+	}
+	return false
+}
+
 func HandleCli() (cmd *CommandRequest, err error) {
 	args := os.Args[1:]
 
 	if helpRequested(args) {
 		return nil, ErrHelpRequested
+	}
+
+	if versionRequested(args) {
+		return nil, ErrVersionRequested
 	}
 
 	if len(args) < 2 {
