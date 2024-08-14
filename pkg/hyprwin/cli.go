@@ -24,8 +24,6 @@ Directions:
     l,r,u,d         For left, right, up, down
     mon:<monitor>   Only for movefocus dispatcher`
 
-const Version string = "v0.1.0"
-
 var (
 	ErrHelpRequested       = errors.New("help requested")
 	ErrVersionRequested    = errors.New("version requested")
